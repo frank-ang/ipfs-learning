@@ -76,3 +76,44 @@ Create keys
 ```
 hub key create 
 ```
+
+Init bucket.
+```
+% cd bucket1
+% hub buck init
+
+% hub buck existing
+
+  NAME     THREAD                                                    KEY                                                          ROOT                                                         
+  bucket1  bafkzgbg5ow2nhqfph3ub6q4ky4unfflijjwa5szwgyjayg7mxqg7e4i  bafzbeigd63guhsa5afceldpmcemcbnkx223mnexvrfcmhodgh5a43db3km  bafybeidvz4aqw5p4lvibllhuhadlptw6dpjdfvcflnt5wrspygavtvavcy  
+
+% hub bucket links
+> Your bucket links:
+> https://hub.textile.io/thread/bafkzgbg5ow2nhqfph3ub6q4ky4unfflijjwa5szwgyjayg7mxqg7e4i/buckets/bafzbeigd63guhsa5afceldpmcemcbnkx223mnexvrfcmhodgh5a43db3km Thread link
+> https://hub.textile.io/ipns/bafzbeigd63guhsa5afceldpmcemcbnkx223mnexvrfcmhodgh5a43db3km IPNS link (propagation can be slow)
+> https://bafzbeigd63guhsa5afceldpmcemcbnkx223mnexvrfcmhodgh5a43db3km.textile.space Bucket website
+
+hub buck push
+# this pushes any changes, e.g. a hello.txt file.
+```
+
+Download from other directory:
+```
+cd somewhere-else
+hub bucket init --existing
+hub pull
+
+```
+
+Archive to Filecoin (error without funds)
+```sh
+ % hub buck archive
+> Warning! The archive will be done in the Filecoin Mainnet. Use with caution.
+Proceed: y█
+? Proceed? [y/N] y█
+> Warning! The wallet address balance is zero, you may need to add some funds!
+> Warning! The Filecoin wallet address isn't verified, which can potentially lead to paying high-prices for storage.
+> You can get verified automatically using your GitHub account at https://verify.glif.io
+> Warning! Are you sure you want to archive with an unverified deal?
+
+```

@@ -38,3 +38,4 @@ Get Pin by ID:
 CID=REPLACE_ME
 curl -X GET https://api.estuary.tech/pinning/pins/:$CID -H "Content-Type: application/json" -H "Authorization: Bearer $API_KEY"
 ```
+

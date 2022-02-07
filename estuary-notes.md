@@ -28,6 +28,12 @@ List deals:
 curl -X GET -H "Authorization: Bearer $API_KEY" https://api.estuary.tech/content/deals | jq .
 ```
 
+Deals seem to appear after several days (!)
+```sh
+curl -X GET -H "Authorization: Bearer $API_KEY" https://api.estuary.tech/content/status/12 | jq .
+```
+
+
 List pins:
 ```sh
 curl -X GET https://api.estuary.tech/pinning/pins -H "Content-Type: application/json" -H "Authorization: Bearer $API_KEY" | jq .

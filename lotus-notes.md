@@ -1,6 +1,6 @@
-# Filecoin Node requirements.
+# Node requirements.
 
-## Filecoin Node requirements.
+## Lotus Node requirements.
 
 * 8-core CPU and 32 GiB RAM. Intel SHA Extensions to speed things up.
 
@@ -27,7 +27,7 @@
         [AWS Pricing Calculator](https://calculator.aws/#/estimate?id=4b8b7bd8587eec3c7cec11189732fe4b9cf2c25a)
 
 
-## Filecoin Miner requirements.
+## Lotus Miner requirements.
 
 * CPU: 8-core. Intel SHA Extensions strongly recommended.
 * RAM 128 GB RAM.

@@ -38,3 +38,31 @@
     * A minimal amount of 1TiB NVMe-based disk space for cache storage is recommended. 
         This disk should be used to store data during the sealing process, to cache Filecoin parameters and serve as general temporal storage location.
 
+# 2022-02-11 Storage and Retrieval Tutorial. 
+
+https://docs.filecoin.io/get-started/store-and-retrieve/set-up/#install-a-lite-node
+
+## Broken on Mac
+
+```sh
+brew tap filecoin-project/lotus
+brew install lotus
+```
+
+## Install and Run on Ubuntu
+
+```sh
+sudo snap install lotus-filecoi
+export FULLNODE_API_INFO=wss://api.chain.love
+/snap/bin/lotus-filecoin.lotus daemon --lite
+```
+
+## Below is broken?
+```bash
+export LOTUS_PATH=~/.lotusLite
+export LOTUS_MINER_PATH=~/.lotusminerLite
+FULLNODE_API_INFO=wss://api.chain.love 
+lotus daemon --lite
+```
+
+

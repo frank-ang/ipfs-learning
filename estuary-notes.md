@@ -200,18 +200,35 @@ npm run dev
 
 > Signin using token: { error: 'ERR_INVALID_TOKEN' }
 
+> Signin succeeds using estuary.tech token. Seems to be pointing to central endpoints https://shuttle-4.estuary.tech/
+
 ## Use the API
 
 ```sh
 export HOST=http://localhost:3004
 export API_KEY=`cat ../estuaryAuthToken.txt`
-curl -X GET $HOST/public/miners
 
+# Public API
+curl -X GET $HOST/public/miners
+curl -X GET $HOST/public/metrics/deals-on-chain
+curl -X GET $HOST/public/miners/storage/query/$MINER
+curl -X GET $HOST/public/miners/stats/$MINER
+curl -X GET $HOST/public/miners/failures/$MINER
+curl -X GET $HOST/public/miners/deals/$MINER
+
+
+# Content
 curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/list
 curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/stats
 curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/pinning/pins 
 
 curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/viewer
+
+export CID=`curl -sX GET -H "Authorization: Bearer $API_KEY" $HOST/content/list | jq -r '.[0].cid'`
+curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/by-cid/$CID
+
+curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/deals
+
 ```
 
 Generate data.

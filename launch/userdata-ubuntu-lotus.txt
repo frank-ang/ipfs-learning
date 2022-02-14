@@ -1,7 +1,11 @@
 #sudo 
-apt update -y && sudo apt upgrade -y
-wget https://github.com/filecoin-project/lotus/releases/download/v1.11.1/Lotus-v1.11.1-x86_64.AppImage
-chmod +x Lotus-v1.11.1-x86_64.AppImage
+apt update -y
+apt install -y net-tools
+apt install -y mesa-opencl-icd ocl-icd-opencl-dev gcc git bzr jq pkg-config curl clang build-essential hwloc libhwloc-dev wget -y 
+apt upgrade -y
+
+#wget https://github.com/filecoin-project/lotus/releases/download/v1.11.1/Lotus-v1.11.1-x86_64.AppImage
+#chmod +x Lotus-v1.11.1-x86_64.AppImage
 #sudo 
-mv Lotus-v1.11.1-x86_64.AppImage /usr/local/bin/lotus
-FULLNODE_API_INFO=wss://api.chain.love lotus daemon --lite
+#mv Lotus-v1.11.1-x86_64.AppImage /usr/local/bin/lotus
+#FULLNODE_API_INFO=wss://api.chain.love lotus daemon --lite

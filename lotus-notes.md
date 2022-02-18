@@ -66,3 +66,84 @@ lotus daemon --lite
 ```
 
 
+# Glif JSON RPC API sample
+```
+curl --location --request POST 'https://api.node.glif.io/rpc/v0' \
+--header 'Content-Type: application/javascript' \
+--data-raw '{
+"jsonrpc": "2.0",
+"method": "Filecoin.ChainHead",
+"id": 1,
+"params": []
+}'
+```
+
+# STORAGE
+
+# Find SP from Filecoin Plus storage registry
+http://lotus.filecoin.io.ipns.localhost:8080/docs/tutorials/store-and-retrieve/
+https://plus.fil.org/
+https://filrep.io/
+
+Using the table, find a couple of storage providers that suit your needs. Try to find storage providers that are geographically close to you, minimum file size is lower than 5 GiB, and charge 0 FIL for verified deals.
+
+```
+s$ lotus client list-deals --show-failed
+DealCid      DealId  Provider  State             On Chain?  Slashed?  PieceCID     Size       Price              Duration  Verified  
+...iix6iqxi  0       f01247    StorageDealError  N          N         ...pl4ciwhy  7.938 GiB  0.00523308 FIL     523308    true      
+  Message: unexpected deal status while waiting for data request: 11 (StorageDealFailing). Provider message: deal rejected: Sorry, we are currently not accepting deals! To store data with us, contact eric(at)chainsafe(dot)io
+...7czfb75a  0       f0838467  StorageDealError  N          N         ...pl4ciwhy  7.938 GiB  0.00002612965 FIL  522593    true      
+  Message: unexpected deal status while waiting for data request: 11 (StorageDealFailing). Provider message: deal rejected: storage price per epoch less than asking price: 50000000 < 400000000
+...e3w4mazm  0       f071624   StorageDealError  N          N         ...pl4ciwhy  7.938 GiB  0.01049132 FIL     524566    true      
+  Message: unexpected deal status while waiting for data request: 11 (StorageDealFailing). Provider message: deal rejected: miner is not considering online storage deals
+...457fbvq4  0       f0838467  StorageDealError  N          N         ...pl4ciwhy  7.938 GiB  0.0002612885 FIL   522577    true      
+  Message: unexpected deal status while waiting for data request: 11 (StorageDealFailing). Provider message: deal rejected: miner is not considering online storage deals
+...jqewqolu  0       f0838467  StorageDealError  N          N         ...pl4ciwhy  7.938 GiB  0.002612815 FIL    522563    true      
+  Message: unexpected deal status while waiting for data request: 11 (StorageDealFailing). Provider message: deal rejected: miner is not considering online storage deals
+
+
+
+```
+
+### Failed:
+f01247
+f0838467
+f071624
+
+### TODO:
+f03488 : (3 deals): StorageDealCheckForAcceptance, StorageDealCheckForAcceptance , StorageDealCheckForAcceptance
+f023467 :  Provider message: deal rejected: Deal rejected | Under maintenance, retry later 
+f01278 : Provider message: deal rejected: Deal rejected | Price below acceptance for such deal : 0.0000001 FIL
+f02576 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
+f023971 : Provider message: deal rejected: miner is not considering online storage deals
+f022163 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
+f019551 : StorageDealAwaitingPreCommit
+f01234  : StorageDealFundsReserved -> failed: exhausted 15 attempts but failed to open stream, err: failed to dial 12D3KooWPWJemjphGa2pANr6j7HCaLyjUvCroHyTJsATY6TaCFAF:
+f033356 : StorageDealCheckForAcceptance / Provider state: StorageDealPublish
+f014768 : StorageDealAwaitingPreCommit
+f010088 : Provider message: deal rejected: miner is not considering online storage deals
+f08403 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
+f0773157 : StorageDealCheckForAcceptance
+f019399 : StorageDealAwaitingPreCommit
+
+```bash
+
+# Find out the miner asks.
+while read in; do echo "miner: $in" && timeout 5 lotus client query-ask "$in"; done < filplusminers.txt &> filplusminers.ask.out
+
+# Create deals
+CID=bafykbzacednsyqcdy2ppxuxyqwgdibe2ltg7mu2tiueh42fyh4uraalhtvc5c
+SPID=<SPID>
+DURATION=521826
+# lotus client deal $CID $SPID 0.0 $DURATION
+while read SPID; do echo "miner: $SPID" && lotus client deal $CID $SPID 0.0 $DURATION; done < filplusminers.txt &> filplusminers.deal.out
+
+lotus client list-deals --show-failed
+
+
+```
+
+# Estuary troubleshooting
+```
+ipfs files cp /ipfs/bafybeighzt4uqbruigiyldnd7yryx7e7kbrrdd3za4nmaxs4foifnp55hi /random5G.txt	
+ipfs files cp /ipfs/bafykbzacednsyqcdy2ppxuxyqwgdibe2ltg7mu2tiueh42fyh4uraalhtvc5c  /random5G.txt	

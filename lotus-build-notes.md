@@ -113,4 +113,12 @@ Edit file:
 
 ```
 
+# Find Suitable Miners
 
+```sh
+lotus state list-miners > miners.out
+while read in; do echo "miner: $in" && timeout 5 lotus client query-ask "$in"; done < miners.out &> query-ask.out
+## Most will be uncontactable. Find the asks.
+grep -A 4 '^Ask: f' query-ask.out > miner-ask.out
+## Find those with reasonable costs.
+```

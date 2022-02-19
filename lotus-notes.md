@@ -111,39 +111,39 @@ f0838467
 f071624
 
 ### TODO:
-f03488 : (3 deals): StorageDealCheckForAcceptance, StorageDealCheckForAcceptance , StorageDealCheckForAcceptance
+f03488 : (3 deals): deal failed: (State=11) error calling node: publishing deal: publish validation failed: simulating deal publish message: apply message failed: All deal proposals invalid (RetCode=16)
 f023467 :  Provider message: deal rejected: Deal rejected | Under maintenance, retry later 
 f01278 : Provider message: deal rejected: Deal rejected | Price below acceptance for such deal : 0.0000001 FIL
 f02576 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
 f023971 : Provider message: deal rejected: miner is not considering online storage deals
 f022163 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
-f019551 : StorageDealAwaitingPreCommit
+f019551 : error waiting for deal pre-commit message to appear on chain: handling applied event: looking for publish deal message bafy2bzacec7dhtbywdtroq3jrwcyzgiovbdlrv6ccrkqljz42okrbn622egww: not found
 f01234  : StorageDealFundsReserved -> failed: exhausted 15 attempts but failed to open stream, err: failed to dial 12D3KooWPWJemjphGa2pANr6j7HCaLyjUvCroHyTJsATY6TaCFAF:
-f033356 : StorageDealCheckForAcceptance / Provider state: StorageDealPublish
-f014768 : StorageDealAwaitingPreCommit
+f033356 : deal failed: (State=11) error calling node: publishing deal: publish validation failed: simulating deal publish message: apply message failed: All deal proposals invalid (RetCode=16)
+f014768 : error waiting for deal pre-commit message to appear on chain: failed to set up called handler: called check error (h: 1561496): failed to look up deal on chain: looking for publish deal message bafy2bzacec36askonuylmy43vrvyghmlhfn3cffpyqywry3gwsnq2syzazf26: not found
 f010088 : Provider message: deal rejected: miner is not considering online storage deals
 f08403 : Provider message: deal rejected: Deal rejected | Such deal is not accepted (type, duration, size, etc...)
-f0773157 : StorageDealCheckForAcceptance
-f019399 : StorageDealAwaitingPreCommit
+f0773157 : error waiting for deal pre-commit message to appear on chain: handling applied event: looking for publish deal message bafy2bzacedghd7xy6f4wvkxmo6enk4xijmluc4xj5yjdsigwhhlgqd2coi7tc: not found
+f019399 : error waiting for deal pre-commit message to appear on chain: failed to set up called handler: called check error (h: 1561497): failed to look up deal on chain: looking for publish deal message bafy2bzacecyz4lzlqbxzszv2pehi2vymknc43taqmypu5akm2zftjzhrbnd5y: not found
 
 ```bash
 
 # Find out the miner asks.
-while read in; do echo "miner: $in" && timeout 5 lotus client query-ask "$in"; done < filplusminers.txt &> filplusminers.ask.out
+while read SPID; do echo "miner: $SPID" && timeout 5 lotus client query-ask "$SPID"; done < filplusminers.txt &> filplusminers.ask.out
 
 # Create deals
 CID=bafykbzacednsyqcdy2ppxuxyqwgdibe2ltg7mu2tiueh42fyh4uraalhtvc5c
 SPID=<SPID>
 DURATION=521826
 # lotus client deal $CID $SPID 0.0 $DURATION
-while read SPID; do echo "miner: $SPID" && lotus client deal $CID $SPID 0.0 $DURATION; done < filplusminers.txt &> filplusminers.deal.out
+while read SPID; do echo "miner: $SPID" && lotus client deal --verified-deal=true $CID $SPID 0.0 $DURATION; done < filplusminers.txt &> filplusminers.deal.out
 
 lotus client list-deals --show-failed
-
-
 ```
+
 
 # Estuary troubleshooting
 ```
 ipfs files cp /ipfs/bafybeighzt4uqbruigiyldnd7yryx7e7kbrrdd3za4nmaxs4foifnp55hi /random5G.txt	
 ipfs files cp /ipfs/bafykbzacednsyqcdy2ppxuxyqwgdibe2ltg7mu2tiueh42fyh4uraalhtvc5c  /random5G.txt	
+```

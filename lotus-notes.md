@@ -147,3 +147,32 @@ lotus client list-deals --show-failed
 ipfs files cp /ipfs/bafybeighzt4uqbruigiyldnd7yryx7e7kbrrdd3za4nmaxs4foifnp55hi /random5G.txt	
 ipfs files cp /ipfs/bafykbzacednsyqcdy2ppxuxyqwgdibe2ltg7mu2tiueh42fyh4uraalhtvc5c  /random5G.txt	
 ```
+
+## Successful deals.
+Retrieval CID https://dweb.link/ipfs/bafybeighzt4uqbruigiyldnd7yryx7e7kbrrdd3za4nmaxs4foifnp55hi
+```
+CID=bafybeighzt4uqbruigiyldnd7yryx7e7kbrrdd3za4nmaxs4foifnp55hi
+Content ID: 18105821
+Provider deals: 
+f01691327
+
+
+curl -X GET -H "Authorization: Bearer $REPLACE_ME_WITH_API_KEY" https://api.estuary.tech/content/status/18105821 | jq .
+
+lotus client inspect-deal --deal-id 3932108
+```
+
+## Retrieval
+```
+lotus client retrieve --miner $MINER $CID outfile.out
+
+```
+
+## Start Listener with NAT
+
+```bash 
+export LOTUS_API_REMOTELISTENADDRESS="13.229.12.157"
+export LOTUS_API_LISTENADDRESS="/ip4/0.0.0.0/tcp/1234/http"
+export FULLNODE_API_INFO=wss://api.chain.love 
+lotus daemon --lite
+```

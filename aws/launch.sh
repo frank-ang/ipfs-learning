@@ -12,8 +12,8 @@ aws ec2 run-instances \
     --security-group-ids $SECURITY_GROUP_IDS \
     --subnet-id $SUBNET_ID \
     --iam-instance-profile "Name=$IAM_INSTANCE_PROFILE_NAME" \
-    --block-device-mapping "DeviceName=/dev/sda1,Ebs={VolumeSize=60,VolumeType=gp3}" \
-    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=lotus},{Key=project,Value=filecoin}]' 'ResourceType=volume,Tags=[{Key=Name,Value=lotus}]' \
+    --block-device-mapping "DeviceName=/dev/sda1,Ebs={VolumeSize=200,VolumeType=gp3}" \
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=lotus-miner},{Key=project,Value=filecoin}]' 'ResourceType=volume,Tags=[{Key=Name,Value=lotus-miner}]' \
     --user-data file://userdata-ubuntu-lotus.txt >  $RUN_INSTANCES_TMP_FILE
 
 sleep 1

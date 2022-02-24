@@ -105,15 +105,23 @@ hub pull
 
 ```
 
-Archive to Filecoin (error without funds)
+Archive to Filecoin
 ```sh
- % hub buck archive
-> Warning! The archive will be done in the Filecoin Mainnet. Use with caution.
-Proceed: y█
-? Proceed? [y/N] y█
-> Warning! The wallet address balance is zero, you may need to add some funds!
-> Warning! The Filecoin wallet address isn't verified, which can potentially lead to paying high-prices for storage.
-> You can get verified automatically using your GitHub account at https://verify.glif.io
-> Warning! Are you sure you want to archive with an unverified deal?
+
+base64 /dev/urandom | head -c 500000000 > 500mb-random.dat
+hub buck push
+
+# check wallet balance
+hub fil addrs
+
+# send funds from a lotus wallet 
+lotus send <address> 0.05
+
+# archive (interactive)
+hub buck archive
+
+# Check status: "archiveStatus": "ARCHIVE_STATUS_EXECUTING",...
+hub buck archive list
+
 
 ```

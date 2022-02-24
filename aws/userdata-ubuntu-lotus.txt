@@ -1,4 +1,10 @@
-#!/bin/sh 
+#!/bin/bash
+while ! ping -c 1 -W 1 ipfs.io; do
+    echo "Waiting for network connectivity..."
+    sleep 1
+done
+
+ping -c 18 -i 10 ipfs.io || exit 1
 apt update -y
 apt-get update
 apt install -y net-tools tmux

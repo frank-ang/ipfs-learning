@@ -1,18 +1,23 @@
 # Lotus Miner Notes.
 
 https://docs.filecoin.io/build/local-devnet/#manual-set-up
+vs
+https://lotus.filecoin.io/docs/developers/local-network/
 
-# Try on Mac.
+# Devnet on Mac.
 
 ## Node terminal session.
 ```
 export LOTUS_PATH=~/.lotusDevnet
 export LOTUS_MINER_PATH=~/.lotusminerDevnet
+export CGO_CFLAGS_ALLOW="-D__BLST_PORTABLE__"
+export CGO_CFLAGS="-D__BLST_PORTABLE__"
 
 # Build on Mac
-git checkout v1.14.1
-export LIBRARY_PATH=/opt/homebrew/lib # will this help with rclone?
+git checkout v1.14.3
+export LIBRARY_PATH=/opt/homebrew/lib
 export FFI_BUILD_FROM_SOURCE=1
+make clean
 make 2k
 
 # configuration
@@ -22,8 +27,12 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 ./lotus-seed genesis new localnet.json
 ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
 
-...Adding miner t01000 to genesis template
-...Giving t3u3sycrnnfzqm3xlcngy6upvv7goqzuhxa256isd35fzlxzm34alos3ouwoie4npcjj53q34d3rkagcpewu7a some initial balance
+
+ % ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
+
+2022-03-01T13:32:51.868+0800	INFO	lotus-seed	lotus-seed/genesis.go:129	Adding miner t01000 to genesis template
+2022-03-01T13:32:51.868+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3qcyd47d3tyzuoz7fws5tiwbkvebkzvn7q33zolbvsmhhw52ui4gvr6gwwqawm2f2jnq4hgplvewbda6b4amq some initial balance
+
 
 
 # start the first node.
@@ -36,33 +45,94 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 export LOTUS_PATH=~/.lotusDevnet
 export LOTUS_MINER_PATH=~/.lotusminerDevnet
 ./lotus wallet import --as-default ~/.genesis-sectors/pre-seal-t01000.key
+
+>> imported key t3qcyd47d3tyzuoz7fws5tiwbkvebkzvn7q33zolbvsmhhw52ui4gvr6gwwqawm2f2jnq4hgplvewbda6b4amq successfully!
+
 ./lotus-miner init --genesis-miner --actor=t01000 --sector-size=2KiB --pre-sealed-sectors=~/.genesis-sectors --pre-sealed-metadata=~/.genesis-sectors/pre-seal-t01000.json --nosync
 ./lotus-miner run --nosync
 
 ```
 
-> Error: failed to compute winning post proof: faulty sectors.
-Appears to be a bug.
+## Try some commands
 
 ```
-2022-02-24T10:09:04.648+0800	INFO	storageminer	storage/miner.go:291	Computing WinningPoSt ;[{SealProof:5 SectorNumber:0 SectorKey:<nil> SealedCID:bagboea4b5abca64vmvq2bieln33ovt4ktqocm36ndeouuvk2yervyqk6t3ulkdyl}]; [123 156 113 9 104 3 192 241 244 234 238 195 2 195 179 137 200 185 133 217 46 237 12 26 250 175 209 182 121 132 133 82]
-2022-02-24T10:09:04.658+0800	ERROR	miner	miner/miner.go:475	completed mineOne	{"tookMilliseconds": 15, "forRound": 152, "baseEpoch": 151, "baseDeltaSeconds": 1692056, "nullRounds": 0, "lateStart": true, "beaconEpoch": 1618181, "lookbackEpochs": 900, "networkPowerAtLookback": "40960", "minerPowerAtLookback": "40960", "isEligible": true, "isWinner": true, "error": "failed to compute winning post proof: faulty sectors [SectorId(0)]", "errorVerbose": "failed to compute winning post proof:\n    github.com/filecoin-project/lotus/miner.(*Miner).mineOne\n        /Users/frankang/lab/lotus/miner/miner.go:545\n  - faulty sectors [SectorId(0)]\n    github.com/filecoin-project/filecoin-ffi.GenerateWinningPoSt\n    \t/Users/frankang/lab/lotus/extern/filecoin-ffi/proofs.go:643\n    github.com/filecoin-project/lotus/extern/sector-storage/ffiwrapper.(*Sealer).GenerateWinningPoSt\n    \t/Users/frankang/lab/lotus/extern/sector-storage/ffiwrapper/verifier_cgo.go:32\n    github.com/filecoin-project/lotus/storage.(*StorageWpp).ComputeProof\n    \t/Users/frankang/lab/lotus/storage/miner.go:294\n    github.com/filecoin-project/lotus/miner.(*Miner).mineOne\n    \t/Users/frankang/lab/lotus/miner/miner.go:543\n    github.com/filecoin-project/lotus/miner.(*Miner).mine\n    \t/Users/frankang/lab/lotus/miner/miner.go:285\n    runtime.goexit\n    \t/opt/homebrew/Cellar/go/1.17.6/libexec/src/runtime/asm_arm64.s:1133"}
-2022-02-24T10:09:04.658+0800	ERROR	miner	miner/miner.go:287	mining block failed: failed to compute winning post proof:
-    github.com/filecoin-project/lotus/miner.(*Miner).mineOne
-        /Users/frankang/lab/lotus/miner/miner.go:545
-  - faulty sectors [SectorId(0)]
-    github.com/filecoin-project/filecoin-ffi.GenerateWinningPoSt
-    	/Users/frankang/lab/lotus/extern/filecoin-ffi/proofs.go:643
-    github.com/filecoin-project/lotus/extern/sector-storage/ffiwrapper.(*Sealer).GenerateWinningPoSt
-    	/Users/frankang/lab/lotus/extern/sector-storage/ffiwrapper/verifier_cgo.go:32
-    github.com/filecoin-project/lotus/storage.(*StorageWpp).ComputeProof
-    	/Users/frankang/lab/lotus/storage/miner.go:294
-    github.com/filecoin-project/lotus/miner.(*Miner).mineOne
-    	/Users/frankang/lab/lotus/miner/miner.go:543
-    github.com/filecoin-project/lotus/miner.(*Miner).mine
-    	/Users/frankang/lab/lotus/miner/miner.go:285
-    runtime.goexit
-    	/opt/homebrew/Cellar/go/1.17.6/libexec/src/runtime/asm_arm64.s:1133
+./lotus wallet list
+Address                                                                                 Balance                         Nonce  Default  
+t3qcyd47d3tyzuoz7fws5tiwbkvebkzvn7q33zolbvsmhhw52ui4gvr6gwwqawm2f2jnq4hgplvewbda6b4amq  49999999.99991597313833236 FIL  1      X        
+
+./lotus-miner info
+Enabled subsystems (from miner API): [Mining Sealing SectorStorage Markets]
+Enabled subsystems (from markets API): [Mining Sealing SectorStorage Markets]
+Chain: [sync behind! (2m16s behind)] [basefee 100 aFIL]
+⚠ 1 Active alerts (check lotus-miner log alerts)
+Miner: t01000 (2 KiB sectors)
+Power: 40 Ki / 40 Ki (100.0000%)
+	Raw: 4 KiB / 4 KiB (100.0000%)
+	Committed: 4 KiB
+	Proving: 4 KiB
+Projected average block win rate: 20024.16/week (every 30s)
+Projected block win with 99.9% probability every 41s
+(projections DO NOT account for future network and miner growth)
+
+Miner Balance:    8326.631 FIL
+      PreCommit:  0
+      Pledge:     2 aFIL
+      Vesting:    6244.973 FIL
+      Available:  2081.658 FIL
+Market Balance:   0
+       Locked:    0
+       Available: 0
+Worker Balance:   50000000 FIL
+Total Spendable:  50002081.658 FIL
+
+Sectors:
+	Total: 2
+	Proving: 2
+
+Storage Deals: 0, 0 B
+
+Retrieval Deals (complete): 0, 0 B
+
+```
+
+Import a local file into Lotus
+```
+./lotus client import /tmp/data/hello-1.1k.txt 
+./lotus client local
+# note the CID.
+export CID=bafk2bzacebtdk5nhnzk7owatobzygsqkhidhbw5ddu4tltkf33uynhhfoe7pu
+
+./lotus client stat $CID
+```
+
+Locate a miner and ask price.
+```
+./lotus state list-miners
+
+./lotus client query-ask t01000
+
+Ask: t01000
+Price per GiB: 0.0000000005 FIL
+Verified Price per GiB: 0.00000000005 FIL
+Max Piece size: 2 KiB
+Min Piece size: 256 B
+```
+
+> Caution: Interactive deals on Devnet seems to result in wrong deal duration.
+```
+./lotus client deal
+./lotus client list-deals  --show-failed 
+## Devnet error:
+...deal rejected: deal duration out of bounds (min, max, provided): 518400, 1555200, 3890836
+```
+
+Make the Deal, non-interactive.
+```
+./lotus client deal $ProposalCid t01000 0.000000000462689374 518400
+
+./lotus client get-deal $DEAL_ID
+# Watch the deal progression.... be patien, takes quite awhile. Go do something else.
+./lotus client list-deals -v --watch
 ```
 
 # TODO
@@ -107,4 +177,12 @@ export LOTUS_MINER_PATH=~/.lotusminerDevnet
 
 ```
 
+Play with miner commands:
+```
+./lotus-miner info
+./lotus-miner log alerts
+
+```
+
 TODO, now what?
+

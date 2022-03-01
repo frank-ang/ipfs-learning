@@ -242,10 +242,11 @@ Add data.
 
 ```sh
 
-curl  -X POST $HOST/content/add -H "Authorization: Bearer $API_KEY" \
+curl  -X POST -H "Authorization: Bearer $API_KEY" \
  -H "Accept: application/json" \
  -H "Content-Type: multipart/form-data" \
- -F "text=@$DATA_FILE;type=text/plain"
+ -F "text=@$DATA_FILE;type=text/plain" \
+ $HOST/content/add 
 ```
 
 

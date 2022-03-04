@@ -162,6 +162,7 @@ curl -X GET -H "Authorization: Bearer $REPLACE_ME_WITH_API_KEY" https://api.estu
 lotus client inspect-deal --deal-id 3932108
 ```
 
+
 ## Retrieval
 ```
 lotus client retrieve --miner $MINER $CID outfile.out

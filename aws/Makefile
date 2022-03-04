@@ -12,7 +12,7 @@ launch:
 
 describe:
 	aws ec2 describe-instances --filters "Name=tag:Name,Values='*lotus*'" \
-		--query "Reservations[*].Instances[*].{Instance:InstanceId,Name:Tags[?Key=='Name']|[0].Value,State:State.Name}" \
+		--query "Reservations[*].Instances[*].{Instance:InstanceId,Name:Tags[?Key=='Name']|[0].Value,State:State.Name,IP:NetworkInterfaces[0].Association.PublicIp}" \
 		--output table
 
 stop-lite: get-instance-id-lite

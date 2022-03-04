@@ -128,11 +128,48 @@ Min Piece size: 256 B
 
 Make the Deal, non-interactive.
 ```
-./lotus client deal $ProposalCid t01000 0.000000000462689374 518400
+./lotus client deal $CID t01000 0.000000000462689374 518400
 
 ./lotus client get-deal $DEAL_ID
 # Watch the deal progression.... be patien, takes quite awhile. Go do something else.
 ./lotus client list-deals -v --watch
+```
+
+> Takes overnight... still at status StorageDealSealing... Why?
+> Add another deal to fill up the 2K sector?
+
+```
+./lotus client import /tmp/data/hello-1.1k-b.txt 
+export CID=bafk2bzacecjdtqacqwggwebosmcbc67ymkj3ahrh4gwd5k7avoxyutpnvyi62
+./lotus client deal $CID t01000 0.000000000462689374 518400
+export DealCID=bafyreiabvuys62j5dbdpwznet2bgg2dpotd3hbadct6h3cdjwrqyvmrukq
+
+./lotus client import /tmp/data/hello-1.1k-c.txt 
+export CID=bafk2bzacec7wql7lo6c4fhfvb2ygviqcdzm3lx2eiufosghgwoeh3gzqvekyi
+./lotus client deal $CID t01000 0.000000000462689374 518400
+export DealCID=bafyreidhgh5z3ei2wy3vfzl7zr743xrmuppmlhxgdygofsalehcynxopva
+```
+
+Check Miner state:
+```
+./lotus-miner info
+./lotus-miner storage-deals list -v
+./lotus-miner data-transfers list
+./lotus-miner pieces list-pieces
+./lotus-miner pieces list-cids
+./lotus-miner pieces cid-info $CID
+./lotus-miner sectors list
+./lotus-miner proving info
+./lotus-miner storage list
+./lotus-miner sealing jobs
+./lotus-miner sealing workers
+./lotus-miner sealing sched-diag
+```
+
+> Note 1 sealing worker but no jobs. Curious.
+```
+./lotus-miner sealing workers
+./lotus-miner sealing jobs
 ```
 
 # TODO
@@ -184,5 +221,56 @@ Play with miner commands:
 
 ```
 
-TODO, now what?
+
+
+# Lotus Storage/Retrieval on Devnet
+
+## CAR Storage
+CAR file.
+```
+npx ipfs-car --pack root/root CID: bafybeihvgkltxopybikozrlpmyzxjdlsqb4ddarlasnxmhh7inuz3izmii
+  output: root.car 
+
+$ ./lotus client import --car ~/data/root.car 
+Import 1646289942953632017, Root bafybeihvgkltxopybikozrlpmyzxjdlsqb4ddarlasnxmhh7inuz3izmii
+
+./lotus client deal $CID t01000 0.000000000462689374 518400
+bafyreie7z3ercarrdptapwhrixaix6nqxqa4fpbsmrtbjjffz4thphofc4
+
+./lotus client list-deals 
+
+./lotus-miner storage-deals list
+./lotus-miner storage-deals pending-publish
+# shows 1 hour to publish
+
+# force publish 
+./lotus-miner storage-deals pending-publish --publish-now
+
+# Failed... create another deal.
+
+$ ./lotus client list-deals --show-failed -v
+# stuck in StorageDealAwaitingPreCommit
+
+./lotus-miner sectors list
+# sector stuck in "WaitDeals", lets force it to seal:
+./lotus-miner sectors seal 2
+
+./lotus-miner sectors list
+# Sector status should move to PrecommitWait -> WaitSeed, CommitWait, Proving -> FinalizeSector
+
+./lotus client list-deals  
+# Deal is active. 
+
+```
+
+## Retrieval.
+
+```
+CID=bafybeihvgkltxopybikozrlpmyzxjdlsqb4ddarlasnxmhh7inuz3izmii
+./lotus client find $CID 
+./lotus client retrieve $CID retrieved-file.out
+./lotus client retrieve --car $CID retrieved-car.out
+
+# success.
+```
 

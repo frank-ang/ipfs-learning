@@ -30,9 +30,7 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
  % ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
 
-2022-03-01T13:32:51.868+0800	INFO	lotus-seed	lotus-seed/genesis.go:129	Adding miner t01000 to genesis template
-2022-03-01T13:32:51.868+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3qcyd47d3tyzuoz7fws5tiwbkvebkzvn7q33zolbvsmhhw52ui4gvr6gwwqawm2f2jnq4hgplvewbda6b4amq some initial balance
-
+...2022-03-07T16:00:13.024+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3wa6af3pnw2tuwc4oql6lz3mbadcp2f2oyxyv2iex7ap6yioc7hh7dq2mi7msikaurfvm5askfntni3mk3obq some initial balance
 
 
 # start the first node.
@@ -142,12 +140,12 @@ Make the Deal, non-interactive.
 ./lotus client import /tmp/data/hello-1.1k-b.txt 
 export CID=bafk2bzacecjdtqacqwggwebosmcbc67ymkj3ahrh4gwd5k7avoxyutpnvyi62
 ./lotus client deal $CID t01000 0.000000000462689374 518400
-export DealCID=bafyreiabvuys62j5dbdpwznet2bgg2dpotd3hbadct6h3cdjwrqyvmrukq
+export DealCID=bafyreig4ywwnpjdvfrkrapgusjtjeosadxzryhi2s3sutjtfzujgitstce
 
 ./lotus client import /tmp/data/hello-1.1k-c.txt 
 export CID=bafk2bzacec7wql7lo6c4fhfvb2ygviqcdzm3lx2eiufosghgwoeh3gzqvekyi
 ./lotus client deal $CID t01000 0.000000000462689374 518400
-export DealCID=bafyreidhgh5z3ei2wy3vfzl7zr743xrmuppmlhxgdygofsalehcynxopva
+export DealCID=bafyreig4ywwnpjdvfrkrapgusjtjeosadxzryhi2s3sutjtfzujgitstce
 ```
 
 Check Miner state:
@@ -171,16 +169,6 @@ Check Miner state:
 ./lotus-miner sealing workers
 ./lotus-miner sealing jobs
 ```
-
-# TODO
-
-* Retry on Ubuntu Linux?
-* Create a deal on Devnet?
-* Investigate other lotus-miner commands?
-* Investigate other binaries: lotus-worker, lotus-gateway, lotus-seed, lotus-shed, lotus-wallet?
-
-* Investigate https://github.com/filecoin-project/lotus/discussions/categories/tutorials
-
 
 # DevNet on Ubuntu.
 
@@ -255,22 +243,89 @@ $ ./lotus client list-deals --show-failed -v
 # sector stuck in "WaitDeals", lets force it to seal:
 ./lotus-miner sectors seal 2
 
+# now sector is in "SubmitPreCommitBatch"
+#  list sectors waiting in precommit batch queue
+./lotus-miner sectors batching precommit
+#  send a batch now
+./lotus-miner sectors batching precommit --publish-now
+
+# now sector is in "SubmitCommitAggregate"
+./lotus-miner sectors batching commit
+./lotus-miner sectors batching commit --publish-now
+
 ./lotus-miner sectors list
 # Sector status should move to PrecommitWait -> WaitSeed, CommitWait, Proving -> FinalizeSector
 
 ./lotus client list-deals  
-# Deal is active. 
+# Deal is StorageDealActive. 
 
 ```
 
 ## Retrieval.
 
 ```
-CID=bafybeihvgkltxopybikozrlpmyzxjdlsqb4ddarlasnxmhh7inuz3izmii
-./lotus client find $CID 
+CID=bafk2bzacec7wql7lo6c4fhfvb2ygviqcdzm3lx2eiufosghgwoeh3gzqvekyi
+
+# drop the local file.
+./lotus client local
+./lotus client drop  [import ID...]
+
+# Find 
+./lotus client find $CID
 ./lotus client retrieve $CID retrieved-file.out
 ./lotus client retrieve --car $CID retrieved-car.out
 
 # success.
 ```
 
+
+# Snap Deals.
+
+https://lotus.filecoin.io/docs/storage-providers/snap-deals/
+
+```bash
+
+% ./lotus-miner sectors list
+
+% ./lotus-miner sectors pledge
+Created CC sector:  3
+
+% ./lotus-miner sectors list
+3   SubmitPreCommitBatch  NO       NO      n/a                          CC    
+```                            
+
+Batching Behavior:
+* Observation: sector is stuck in SubmitPreCommitBatch.
+* Remove batching by set "BatchPreCommits = false" and "AggregateCommits = false". 
+* Restart miner.
+* Now, sector status changes to WaitSeed -> Committing -> CommitWait -> Proving.
+* HOWEVER sector still not Active
+* WAIT... sector takes 30-60 mins (approx?) to become Active.
+
+
+```bash
+% ./lotus-miner sectors snap-up 6
+# sector state becomes: SnapDealsWaitDeals
+
+# Deal!
+./lotus client import [file]
+./lotus client deal $ROOT t01000 0.00001 600001
+
+```
+
+Deal publishing "might take awhile"... lets speed it along?
+
+```bash
+./lotus-miner storage-deals list
+# state is StorageDealPublish
+./lotus-miner storage-deals pending-publish
+./lotus-miner storage-deals pending-publish --publish-now
+# state goes to StorageDealPublishing -> StorageDealActive
+# Success.
+./lotus client list-deals
+./lotus client find $ROOT
+./lotus client cat $ROOT
+
+# Sector state goes into UpdateActivating
+./lotus-miner sectors list
+```

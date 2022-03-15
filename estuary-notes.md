@@ -2,7 +2,7 @@
 
 Set environment variable
 ```sh
-export API_KEY=REPLACE_ME_WITH_API_KEY
+export ESTUARY_TOKEN=REPLACE_ME_WITH_ESTUARY_TOKEN
 ```
 
 Create a large 1GB file
@@ -14,35 +14,35 @@ base64 /dev/urandom | head -c 1000000000 > $DATA_FILE
 Add file
 ```sh
 curl -X POST https://shuttle-5.estuary.tech/content/add -H \
-"Authorization: Bearer $API_KEY" -H "Accept: application/json" -H "Content-Type: multipart/form-data" \
+"Authorization: Bearer $ESTUARY_TOKEN" -H "Accept: application/json" -H "Content-Type: multipart/form-data" \
 -F "data=@$DATA_FILE"
 ```
 
 List stats:
 ```sh
-curl -X GET -H "Authorization: Bearer $API_KEY" https://api.estuary.tech/content/stats | jq .
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" https://api.estuary.tech/content/stats | jq .
 ```
 
 List deals:
 ```sh
-curl -X GET -H "Authorization: Bearer $API_KEY" https://api.estuary.tech/content/deals | jq .
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" https://api.estuary.tech/content/deals | jq .
 ```
 
 Deals seem to appear after several days (!)
 ```sh
-curl -X GET -H "Authorization: Bearer $API_KEY" https://api.estuary.tech/content/status/12 | jq .
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" https://api.estuary.tech/content/status/12 | jq .
 ```
 
 
 List pins:
 ```sh
-curl -X GET https://api.estuary.tech/pinning/pins -H "Content-Type: application/json" -H "Authorization: Bearer $API_KEY" | jq .
+curl -X GET https://api.estuary.tech/pinning/pins -H "Content-Type: application/json" -H "Authorization: Bearer $ESTUARY_TOKEN" | jq .
 ```
 
 Get Pin by ID:
 ```sh
 CID=REPLACE_ME
-curl -X GET https://api.estuary.tech/pinning/pins/:$CID -H "Content-Type: application/json" -H "Authorization: Bearer $API_KEY"
+curl -X GET https://api.estuary.tech/pinning/pins/:$CID -H "Content-Type: application/json" -H "Authorization: Bearer $ESTUARY_TOKEN"
 ```
 
 # 2022-02-09 estuary.tech experiment
@@ -161,8 +161,8 @@ ulimit -n 10000
 
 ```sh
 # Init shuttle
-export AUTH_TOKEN=`cat ../estuaryAuthToken.txt`
-curl -H "Authorization: Bearer $AUTH_TOKEN" -X POST localhost:3004/admin/shuttle/init
+export ESTUARY_TOKEN=`cat ../estuaryAuthToken.txt`
+curl -H "Authorization: Bearer $ESTUARY_TOKEN" -X POST localhost:3004/admin/shuttle/init
 # Note down the output, set environment variables
 
 # Increase file limit
@@ -205,29 +205,29 @@ npm run dev
 ## Use the API
 
 ```sh
-export HOST=http://localhost:3004
-export API_KEY=`cat ../estuaryAuthToken.txt`
+export EST_HOST=http://localhost:3004
+export ESTUARY_TOKEN=`cat ../estuaryAuthToken.txt`
 
 # Public API
-curl -X GET $HOST/public/miners
-curl -X GET $HOST/public/metrics/deals-on-chain
-curl -X GET $HOST/public/miners/storage/query/$MINER
-curl -X GET $HOST/public/miners/stats/$MINER
-curl -X GET $HOST/public/miners/failures/$MINER
-curl -X GET $HOST/public/miners/deals/$MINER
+curl -X GET $EST_HOST/public/miners
+curl -X GET $EST_HOST/public/metrics/deals-on-chain
+curl -X GET $EST_HOST/public/miners/storage/query/$MINER
+curl -X GET $EST_HOST/public/miners/stats/$MINER
+curl -X GET $EST_HOST/public/miners/failures/$MINER
+curl -X GET $EST_HOST/public/miners/deals/$MINER
 
 
 # Content
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/list
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/stats
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/pinning/pins 
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/list
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/stats
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/pinning/pins 
 
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/viewer
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/viewer
 
-export CID=`curl -sX GET -H "Authorization: Bearer $API_KEY" $HOST/content/list | jq -r '.[0].cid'`
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/by-cid/$CID
+export CID=`curl -sX GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/list | jq -r '.[0].cid'`
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/by-cid/$CID
 
-curl -X GET -H "Authorization: Bearer $API_KEY" $HOST/content/deals
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/deals
 
 ```
 
@@ -242,11 +242,11 @@ Add data.
 
 ```sh
 
-curl  -X POST -H "Authorization: Bearer $API_KEY" \
+curl  -X POST -H "Authorization: Bearer $ESTUARY_TOKEN" \
  -H "Accept: application/json" \
  -H "Content-Type: multipart/form-data" \
- -F "text=@$DATA_FILE;type=text/plain" \
- $HOST/content/add 
+ -F "data=@$DATA_FILE;type=text/plain" \
+ $EST_HOST/content/add 
 ```
 
 
@@ -254,3 +254,212 @@ curl  -X POST -H "Authorization: Bearer $API_KEY" \
 
 
 2022-02-10T13:16:42.608Z        INFO    estuary estuary/replication.go:2329     deal failure error      {"miner": "f071624", "phase": "propose", "msg": "unrecognized response state 11: deal rejected: node error getting client market balance failed: resolve address f1vmby5xim3urt6v3pudtsjknfwzyb2do5qonrvii: actor not found", "content": 1}
+
+
+# Estuary on local MacOS:
+
+Setup.
+
+```
+% ./estuary setup
+adding default miner list to database...
+Auth Token: ESTcfad3528-57b2-487e-8cda-f8ad7863dc86ARY
+```
+
+Run.
+
+```
+export FULLNODE_API_INFO=wss://api.chain.love
+./estuary --datadir=/tmp/estuary --logging
+
+# Run on Devnet
+./estuary --datadir=/tmp/estuary --repo=~/.lotusDevnet --logging
+
+
+Wallet address is:  f15rk2buq4fniqcy32x5tvnylrdvyzvbojw5diani
+...
+⇨ http server started on [::]:3004
+```
+
+> Runs on port: 3004
+
+Test
+
+```
+export EST_HOST=http://localhost:3004
+curl -X GET $EST_HOST/public/miners
+curl -X GET -H "Authorization: Bearer $ESTUARY_TOKEN" $EST_HOST/content/staging-zones
+
+```
+
+Init Shuttle
+
+```
+export FULLNODE_API_INFO=wss://api.chain.love
+curl -H "Authorization: Bearer $ESTUARY_TOKEN" -X POST $EST_HOST/admin/shuttle/init
+
+{"handle":"SHUTTLEc8b46e7e-3c26-41cf-be63-003cf7261975HANDLE","token":"SECRET92da2c32-c6e5-4867-80ee-159e312c9433SECRET"}
+
+{"handle":"SHUTTLE5b2b280b-0d7b-4ef6-9307-8a4c5d45f6ccHANDLE","token":"SECRET83211817-8c4f-4013-bf51-1eb4bb1ebd53SECRET"}
+
+```
+
+Start Shuttle
+
+```
+./estuary-shuttle --dev --estuary-api=localhost:3004 --auth-token=$SHUTTLE1_TOKEN --handle=$SHUTTLE1_HANDLE
+
+⇨ http server started on [::]:3005
+```
+
+> Runs on port: 3005
+
+add a dummy file.
+```
+./add-file.sh                          
++ curl --progress-bar -X POST -H 'Authorization: Bearer EST7784af1e-e4bb-4e57-a96c-a76c2a32c513ARY' -F data=@files/dummy.file -F name=dummy.file 'http://localhost:3004/content/add?collection='
+{"cid":"bafkqaflunbuxgidjomqgcideovww26jamzuwyzik","estuaryId":1,"providers":["/ip4/192.168.1.167/tcp/6744/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/127.0.0.1/tcp/6744/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/172.22.16.78/tcp/24347/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/103.6.151.82/tcp/24347/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE"]}
+```
+
+add another test file
+```
+curl  -X POST -H "Authorization: Bearer $ESTUARY_TOKEN" \
+ -H "Accept: application/json" \
+ -H "Content-Type: multipart/form-data" \
+ -F "data=@$DATA_FILE;type=text/plain" \
+ $EST_HOST/content/add
+{"cid":"bafkreicsc76eag6svbliy7dwye2b7nw3eptth4pwgskkbna6bxef76bpbi","estuaryId":3,"providers":["/ip4/192.168.1.167/tcp/6744/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/127.0.0.1/tcp/6744/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/172.22.16.78/tcp/24347/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE","/ip4/103.6.151.82/tcp/24347/p2p/12D3KooWD6AUkW2GduxnxLjLxAv5kZUMuvEtPXbzv7pxBx5VEcJE"]}
+```
+
+
+## Estuary WWW on local Mac.
+
+```
+npm install
+ESTUARY_API=http://localhost:3004 npm run dev
+
+```
+
+> Runs on http://localhost:4444
+
+Login using API Key.
+
+## Estuary Admin:
+
+### Balance TODO
+
+> Add FIL or DataCap.
+
+> Add to Estuary Escrow
+
+
+### Storage Providers
+
+> Setup a miner.
+
+Get signature
+
+To get started with adding a provider/miner, please enter your provider/miner ID to obtain a hex message and a command to run on Lotus.
+
+MinerID: f01000
+```
+lotus wallet sign YOUR_WORKER_ADDRESS 2d2d2d2d20757365722031206f776e73206d696e657220663031303030202d2d2d2d
+```
+
+Claim your miner
+Use the signature provided to claim your miners.
+...
+
+
+## Restart Estuary against local devnet??
+
+export FULLNODE_API_INFO=ws://localhost:1234 
+./estuary --datadir=/tmp/estuary --logging
+
+> ERROR
+
+Click "Balance" shows Actor Not Found
+
+```
+# Estuary
+{"time":"2022-03-11T17:40:34.042569+08:00","id":"","remote_ip":"::1","host":"localhost:3004","method":"GET","uri":"/admin/balance","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36","status":500,"error":"resolution lookup failed (t1iijcqzkckbxb6pvwbxcmyncnqcrlym6iivaisui): resolve address t1iijcqzkckbxb6pvwbxcmyncnqcrlym6iivaisui: actor not found","latency":693084,"latency_human":"693.084µs","bytes_in":0,"bytes_out":157}
+
+# Lotus
+2022-03-11T17:40:34.042+0800	WARN	rpc	go-jsonrpc@v0.1.5/handler.go:279	error in RPC call to 'Filecoin.StateGetActor': resolution lookup failed (t1iijcqzkckbxb6pvwbxcmyncnqcrlym6iivaisui):
+    github.com/filecoin-project/lotus/chain/state.(*StateTree).GetActor
+        /Users/frankang/lab/lotus/chain/state/statetree.go:362
+  - resolve address t1iijcqzkckbxb6pvwbxcmyncnqcrlym6iivaisui:
+    github.com/filecoin-project/lotus/chain/state.(*StateTree).lookupIDinternal
+        /Users/frankang/lab/lotus/chain/state/statetree.go:327
+  - actor not found
+
+
+```
+
+### Add FIL to estuary
+
+> Seems important for wallet operations: unset FULLNODE_API_INFO
+```
+unset FULLNODE_API_INFO
+lotus wallet list
+```
+
+Transfer FIL from node wallet to estuary wallet.
+```
+lotus wallet list
+
+Address                                                                                 Balance                          Nonce  Default  
+t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q  49999999.999915349778595596 FIL  2      X    
+
+lotus send --from t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q f15rk2buq4fniqcy32x5tvnylrdvyzvbojw5diani 1
+bafy2bzacedcowuccoh7b3mcw5mpwttunjdpx5hzvnyplornket2dgpe5fgdto
+
+```
+
+> Confirm on estuary-www of balance 1,000,000 FIL in Estuary wallet ...
+
+### Transfer FIL to Estuary Escrow:
+
+> TODO: Troubleshoot:
+
+NODE ERROR:
+```
+2022-03-14T16:39:08.496+0800	WARN	rpc	go-jsonrpc@v0.1.5/handler.go:279	error in RPC call to 'Filecoin.MpoolPush': missing permission to invoke 'MpoolPush' (need 'write'):
+    github.com/filecoin-project/go-jsonrpc/auth.PermissionedProxy.func1
+        /Users/frankang/go/pkg/mod/github.com/filecoin-project/go-jsonrpc@v0.1.5/auth/auth.go:65
+```
+
+Estuary ERROR:
+```
+{"time":"2022-03-14T16:37:10.181493+08:00","id":"","remote_ip":"::1","host":"localhost:3004","method":"OPTIONS","uri":"/admin/add-escrow/1","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36","status":204,"error":"","latency":13500,"latency_human":"13.5µs","bytes_in":0,"bytes_out":0}
+2022-03-14T16:37:10.188+0800	ERROR	estuary	estuary/handlers.go:96	handler error: missing permission to invoke 'MpoolPush' (need 'write')
+{"time":"2022-03-14T16:37:10.188074+08:00","id":"","remote_ip":"::1","host":"localhost:3004","method":"POST","uri":"/admin/add-escrow/1","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36","status":500,"error":"missing permission to invoke 'MpoolPush' (need 'write')","latency":5213167,"latency_human":"5.213167ms","bytes_in":2,"bytes_out":68}
+```
+
+> Things to try... nope. But the CLI did reproduce the error message.
+
+```
+./lotus -vv auth create-token --perm admin 
+using raw API v0 endpoint: ws://localhost:1234/rpc/v0
+2022-03-14T22:24:54.725+0800	WARN	cliutil	util/apiinfo.go:81	API Token not set and requested, capabilities might be limited.
+ERROR: missing permission to invoke 'AuthNew' (need 'admin')
+
+
+2022-03-14T22:24:54.731+0800	WARN	rpc	go-jsonrpc@v0.1.5/handler.go:279	error in RPC call to 'Filecoin.AuthNew': missing permission to invoke 'AuthNew' (need 'write'):
+    github.com/filecoin-project/go-jsonrpc/auth.PermissionedProxy.func1
+        /Users/frankang/go/pkg/mod/github.com/filecoin-project/go-jsonrpc@v0.1.5/auth/auth.go:65
+```
+
+Maybe not worthwhile: ESTUARY_LIGHTSTEP_TOKEN variable, seems something to do with monitoring?
+ExecStart=/usr/local/bin/estuary --database=${ESTUARY_DB_CONN} --datadir=${ESTUARY_DATA} --lightstep-token=${ESTUARY_LIGHTSTEP_TOKEN} --logging setup
+
+
+> Another idea?. ...
+
+
+
+### Add the devnet miner.
+
+TODO...
+
+### Init and Launch Estuary shuttle

@@ -28,9 +28,8 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
 
 
- % ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
-
-...2022-03-07T16:00:13.024+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3wa6af3pnw2tuwc4oql6lz3mbadcp2f2oyxyv2iex7ap6yioc7hh7dq2mi7msikaurfvm5askfntni3mk3obq some initial balance
+2022-03-14T13:29:36.642+0800	INFO	lotus-seed	lotus-seed/genesis.go:129	Adding miner t01000 to genesis template
+2022-03-14T13:29:36.642+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q some initial balance
 
 
 # start the first node.
@@ -38,15 +37,30 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
 ```
 
+Sanity test
+
+```
+curl -X POST \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer $(cat $LOTUS_PATH/token)" \
+--data '{ "jsonrpc": "2.0", "method": "Filecoin.ChainHead", "params": [], "id": 1 }' \
+'http://127.0.0.1:1234/rpc/v0'
+
+```
+
+
 ## Miner (Storage Provider) session.
 ```
 export LOTUS_PATH=~/.lotusDevnet
 export LOTUS_MINER_PATH=~/.lotusminerDevnet
 ./lotus wallet import --as-default ~/.genesis-sectors/pre-seal-t01000.key
 
->> imported key t3qcyd47d3tyzuoz7fws5tiwbkvebkzvn7q33zolbvsmhhw52ui4gvr6gwwqawm2f2jnq4hgplvewbda6b4amq successfully!
+## imported key t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q successfully!
 
+## Init
 ./lotus-miner init --genesis-miner --actor=t01000 --sector-size=2KiB --pre-sealed-sectors=~/.genesis-sectors --pre-sealed-metadata=~/.genesis-sectors/pre-seal-t01000.json --nosync
+
+## run 
 ./lotus-miner run --nosync
 
 ```

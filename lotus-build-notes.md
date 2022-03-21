@@ -122,3 +122,5 @@ while read in; do echo "miner: $in" && timeout 5 lotus client query-ask "$in"; d
 grep -A 4 '^Ask: f' query-ask.out > miner-ask.out
 ## Find those with reasonable costs.
 ```
+
+

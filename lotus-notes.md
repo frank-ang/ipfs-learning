@@ -177,3 +177,18 @@ export LOTUS_API_LISTENADDRESS="/ip4/0.0.0.0/tcp/1234/http"
 export FULLNODE_API_INFO=wss://api.chain.love 
 lotus daemon --lite
 ```
+
+## Troubleshoot Client
+
+1. API Token not set and requested
+
+Symptom: CLI warning message: "WARN	cliutil	util/apiinfo.go:81	API Token not set and requested, capabilities might be limited."
+
+Fix: ```unset FULLNODE_API_INFO```
+
+
+## RPC API
+WIP...
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $(cat ~/.lotusDevnet/token)" --data '{"jsonrpc":"2.0","method":"Filecoin.ClientGenCar","params": [{"Path": "/Users/lexluthr/mayank-pandey_SWIFT.pdf", "IsCAR": true}, "/Users/lexluthr/test.car"], "id": 1}' 'http://127.0.0.1:1234/rpc/v0' 
+```

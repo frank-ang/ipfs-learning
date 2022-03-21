@@ -29,7 +29,7 @@ export LOTUS_SKIP_GENESIS_CHECK=_yes_
 
 
 2022-03-14T13:29:36.642+0800	INFO	lotus-seed	lotus-seed/genesis.go:129	Adding miner t01000 to genesis template
-2022-03-14T13:29:36.642+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q some initial balance
+2022-03-14T13:29:36.642+0800	INFO	lotus-seed	lotus-seed/genesis.go:146	Giving t3tggme5uo7asnx5j7igm2wtg4f2iovza6xg6ddj7yuq2vtrwy7e3j32hgwxcpsqkwa4ylj4o7mk4qnjjlvhia some initial balance
 
 
 # start the first node.
@@ -191,7 +191,7 @@ Build Node, initialize, and fund wallet. As per https://docs.filecoin.io/build/l
 ```bash
 # follow build instructions ...
 ./lotus-seed genesis add-miner localnet.json ~/.genesis-sectors/pre-seal-t01000.json
-...Giving t3vssd22d3mvwzrz746qxoqxby4shvu6rdbfs4eb5kybi24n5okf2vz7mbirjzdbfeljpotqzgzrltt4d2qkua some initial balance
+...Giving t3tgiy2rlws7welqt5erqyojgi7lfvhe4acxal3jsadtfqh32gfo4ggye2njvgfithcezmlnkegpncus5auvbq some initial balance
 ```
 
 Start Node

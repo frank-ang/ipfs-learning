@@ -261,9 +261,9 @@ curl  -X POST -H "Authorization: Bearer $ESTUARY_TOKEN" \
 Setup.
 
 ```
-% ./estuary setup
+./estuary setup
 adding default miner list to database...
-Auth Token: ESTcfad3528-57b2-487e-8cda-f8ad7863dc86ARY
+Auth Token: EST7da12584-1542-463b-8254-e404da3e4e45ARY
 ```
 
 Run.
@@ -337,7 +337,6 @@ curl  -X POST -H "Authorization: Bearer $ESTUARY_TOKEN" \
 ```
 npm install
 ESTUARY_API=http://localhost:3004 npm run dev
-
 ```
 
 > Runs on http://localhost:4444
@@ -436,26 +435,27 @@ Estuary ERROR:
 {"time":"2022-03-14T16:37:10.188074+08:00","id":"","remote_ip":"::1","host":"localhost:3004","method":"POST","uri":"/admin/add-escrow/1","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36","status":500,"error":"missing permission to invoke 'MpoolPush' (need 'write')","latency":5213167,"latency_human":"5.213167ms","bytes_in":2,"bytes_out":68}
 ```
 
-> Things to try... nope. But the CLI did reproduce the error message.
+### Things to try... .
 
+> IMPORTANT: CLI requires ```unset FULLNODE_API_INFO```
+
+To avoid the error:
 ```
-./lotus -vv auth create-token --perm admin 
-using raw API v0 endpoint: ws://localhost:1234/rpc/v0
-2022-03-14T22:24:54.725+0800	WARN	cliutil	util/apiinfo.go:81	API Token not set and requested, capabilities might be limited.
+API Token not set and requested, capabilities might be limited.
 ERROR: missing permission to invoke 'AuthNew' (need 'admin')
-
-
-2022-03-14T22:24:54.731+0800	WARN	rpc	go-jsonrpc@v0.1.5/handler.go:279	error in RPC call to 'Filecoin.AuthNew': missing permission to invoke 'AuthNew' (need 'write'):
-    github.com/filecoin-project/go-jsonrpc/auth.PermissionedProxy.func1
-        /Users/frankang/go/pkg/mod/github.com/filecoin-project/go-jsonrpc@v0.1.5/auth/auth.go:65
 ```
 
-Maybe not worthwhile: ESTUARY_LIGHTSTEP_TOKEN variable, seems something to do with monitoring?
-ExecStart=/usr/local/bin/estuary --database=${ESTUARY_DB_CONN} --datadir=${ESTUARY_DATA} --lightstep-token=${ESTUARY_LIGHTSTEP_TOKEN} --logging setup
+Create a write token (illustration)
+```
+unset FULLNODE_API_INFO
 
+lotus auth create-token --perm write
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiXX0.X-S093DHDPywB4OuRX4wwIwbxtVFx_1m5NLzUNNqkTs
 
-> Another idea?. ...
+lotus auth create-token --perm admin
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.1NmwdhS8nfgpbJuvgWMk7ZnsP6sVcMRe5x1RDRee3eY
 
+```
 
 
 ### Add the devnet miner.

@@ -188,7 +188,29 @@ Fix: ```unset FULLNODE_API_INFO```
 
 
 ## RPC API
-WIP...
-```bash
-curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $(cat ~/.lotusDevnet/token)" --data '{"jsonrpc":"2.0","method":"Filecoin.ClientGenCar","params": [{"Path": "/Users/lexluthr/mayank-pandey_SWIFT.pdf", "IsCAR": true}, "/Users/lexluthr/test.car"], "id": 1}' 'http://127.0.0.1:1234/rpc/v0' 
+
+Create Token
+```
+%  lotus auth create-token --perm admin
+%  lotus auth create-token --perm write
+```
+
+Request (Token is optional)
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  --data '{ "jsonrpc": "2.0", "method": "Filecoin.Version", "params": [], "id": 1 }'      'http://localhost:1234/rpc/v0'
+
+# or use the default token
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(cat ~/.lotusDevnet/token)" \
+  --data '{ "jsonrpc": "2.0", "method": "Filecoin.Version", "params": [], "id": 1 }'      'http://localhost:1234/rpc/v0'
+```
+
+Response
+```
+{"jsonrpc":"2.0","result":{"Version":"1.15.0+2k+git.0ac1bbc7a","APIVersion":66816,"BlockDelay":4},"id":1}
 ```

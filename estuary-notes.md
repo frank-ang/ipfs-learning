@@ -370,7 +370,7 @@ Use the signature provided to claim your miners.
 ...
 
 
-## Restart Estuary against local devnet??
+## Restart Estuary against local devnet
 
 export FULLNODE_API_INFO=ws://localhost:1234 
 ./estuary --datadir=/tmp/estuary --logging
@@ -403,21 +403,28 @@ unset FULLNODE_API_INFO
 lotus wallet list
 ```
 
+Get the estuary wallet address in the estuary console.
+```
+Wallet address is:  <ADDRESS_HERE>
+```
+
 Transfer FIL from node wallet to estuary wallet.
 ```
 lotus wallet list
 
 Address                                                                                 Balance                          Nonce  Default  
-t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q  49999999.999915349778595596 FIL  2      X    
+t3r32thhhdzb5rhvkxqbobirkdcqpyuakibrcykr7px4sotexpo5ey3lzawmp7orhyk4ekht5syxc77nmn6rqa  49999999.999913475777038534 FIL  5      X 
 
-lotus send --from t3wkdggj5l2solqyar36tyduied2svzsou3rmfzyy4mzm7nllxmpupucnxqgc4a7sefnk7u2r3pwswycmgig5q f15rk2buq4fniqcy32x5tvnylrdvyzvbojw5diani 1
-bafy2bzacedcowuccoh7b3mcw5mpwttunjdpx5hzvnyplornket2dgpe5fgdto
+lotus send --from t3r32thhhdzb5rhvkxqbobirkdcqpyuakibrcykr7px4sotexpo5ey3lzawmp7orhyk4ekht5syxc77nmn6rqa f1btnpfivspuy5ekksku7gkgdnteydmda6kv33oba 1
 
+# and so on...
 ```
 
-> Confirm on estuary-www of balance 1,000,000 FIL in Estuary wallet ...
+> Confirm on estuary-www of balance FIL in Estuary wallet ...
 
 ### Transfer FIL to Estuary Escrow:
+
+Click transfer feature on estuary-www page. 
 
 > TODO: Troubleshoot:
 
@@ -454,8 +461,56 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiXX0.X-S093D
 
 lotus auth create-token --perm admin
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJBbGxvdyI6WyJyZWFkIiwid3JpdGUiLCJzaWduIiwiYWRtaW4iXX0.1NmwdhS8nfgpbJuvgWMk7ZnsP6sVcMRe5x1RDRee3eY
+```
+
+### How to authorize Estuary for Lotus write API calls?
+
+> Which token is Estuary using??
+> Capture packet trace?
+```
+networksetup -listallhardwareports
+
+sudo tcpdump -i lo0 -v
+sudo tcpdump -i lo0 -v 'tcp port 1234'
+sudo tcpdump -i lo0 -v -w /tmp/loopback.pcap 'tcp port 1234'
+sudo tcpdump -i lo0 -s 0 -B 524288 -v -w /tmp/loopback.pcap 'tcp port 1234'
 
 ```
+
+> Wireshark trace shows the Auth header is missing. Estuary is not sending Auth.
+
+```
+POST /rpc/v1 HTTP/1.1
+Host: localhost:1234
+User-Agent: Go-http-client/1.1
+Content-Length: 656
+Content-Type: application/json
+Accept-Encoding: gzip
+
+{"jsonrpc":"2.0","id":17,"method":"Filecoin.MpoolPush","params":[{"Message":{"Version":0,"To":"f05","From":"f1btnpfivspuy5ekksku7gkgdnteydmda6kv33oba","Nonce":0,"Value":"1000000000000000000","GasLimit":1332693,"GasFeeCap":"4000000000","GasPremium":"200346","Method":2,"Params":"VQEM2vKisn0x0ilSVT5lGG2ZMDYMHg==","CID":{"/":"bafy2bzaceanaw2alvv3e2fylyipujnfvpzllgmuh35awrjce66bxky2hfhc7a"}},"Signature":{"Type":1,"Data":"kPysHsv+pFv33LnDUbUeqWuH0MshRDMqIwVPu556uAVKIq6DEfkzCir3gaLZiaaiDhLZVfIryy0WJdRkhC1LnQE="},"CID":{"/":"bafy2bzacea6w7c4jdmawp7lq43fptmpvm2qfti7747pjayzccs6dmfmzehxem"}}],"meta":{"SpanContext":"AAD7d7TedRAPrt0PCqH3ednZAa4FUZ9AAmE+AgA="}}
+
+HTTP/1.1 200 OK
+Date: Tue, 22 Mar 2022 08:28:06 GMT
+Content-Length: 113
+Content-Type: text/plain; charset=utf-8
+
+{"jsonrpc":"2.0","id":17,"error":{"code":1,"message":"missing permission to invoke 'MpoolPush' (need 'write')"}}
+```
+
+> Try manually posting the MPoolPush message using curl.
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $(cat ~/.lotusDevnet/token)" \
+  --data '{"jsonrpc":"2.0","id":17,"method":"Filecoin.MpoolPush","params":[{"Message":{"Version":0,"To":"f05","From":"f1btnpfivspuy5ekksku7gkgdnteydmda6kv33oba","Nonce":0,"Value":"1000000000000000000","GasLimit":1332693,"GasFeeCap":"4000000000","GasPremium":"200346","Method":2,"Params":"VQEM2vKisn0x0ilSVT5lGG2ZMDYMHg==","CID":{"/":"bafy2bzaceanaw2alvv3e2fylyipujnfvpzllgmuh35awrjce66bxky2hfhc7a"}},"Signature":{"Type":1,"Data":"kPysHsv+pFv33LnDUbUeqWuH0MshRDMqIwVPu556uAVKIq6DEfkzCir3gaLZiaaiDhLZVfIryy0WJdRkhC1LnQE="},"CID":{"/":"bafy2bzacea6w7c4jdmawp7lq43fptmpvm2qfti7747pjayzccs6dmfmzehxem"}}],"meta":{"SpanContext":"AAD7d7TedRAPrt0PCqH3ednZAa4FUZ9AAmE+AgA="}}' 'http://localhost:1234/rpc/v0'
+```
+
+Result, successful. But not sure if any follow-up API calls are required to complete the Escrow...?
+```
+{"jsonrpc":"2.0","result":{"/":"bafy2bzacea6w7c4jdmawp7lq43fptmpvm2qfti7747pjayzccs6dmfmzehxem"},"id":17}
+```
+
 
 
 ### Add the devnet miner.

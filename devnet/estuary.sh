@@ -1,7 +1,7 @@
 #!/bin/bash
 . ./devnet.env
 export ESTUARY_BIN_PATH=$HOME/lab/estuary
-export FULLNODE_API_INFO=ws://localhost:1234
+export FULLNODE_API_INFO=http://localhost:1234
 export ESTUARY_DATA_DIR=/tmp/estuary
 export ESTUARY_AUTH_TOKEN_FILE="$ESTUARY_BIN_PATH/estuary_auth_token.gitignore"
 
@@ -35,7 +35,9 @@ setup_estuary () {
 start_estuary () {
     echo "#### Starting Estuary... "
     cd $ESTUARY_BIN_PATH
-    $ESTUARY_BIN_PATH/estuary --datadir=$ESTUARY_DATA_DIR --repo=$LOTUS_PATH sqlite=$ESTUARY_BIN_PATH/estuary.db --logging
+    CMD="$ESTUARY_BIN_PATH/estuary --datadir=$ESTUARY_DATA_DIR --repo=$LOTUS_PATH sqlite=$ESTUARY_BIN_PATH/estuary.db --logging"
+    echo "executing: $CMD"
+    $($CMD)
 }
 
 if [[ $# -lt 1 ]]; then help && exit 1; fi

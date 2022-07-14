@@ -72,6 +72,7 @@ Parameters:
   InstanceType:
     Description: EC2 Instance Type
     Type: String
+    # Season to taste
     Default: r5d.large
     AllowedValues:
       - r5d.large
@@ -132,6 +133,7 @@ Resources:
 
           # Cloudformation helper scripts on default python 3.8
           wget --no-verbose -O /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
+          python3 -m easy_install --script-dir /opt/aws/bin /tmp/aws-cfn-bootstrap-py3-latest.tar.gz
 
           # DUMP ENV
           echo "Dumping environment..."
@@ -155,12 +157,8 @@ Resources:
           . "$NVM_DIR/nvm.sh"
           . "$NVM_DIR/bash_completion"
 
-          # TODO check nvm
-          echo "## nvm version: "`nvm version` 
-
+          echo "## nvm version: "`nvm version`
           echo "## Installing Node..." 
-
-          # Install node v16
           nvm install 16
 
           echo "## which node: "`which node`
@@ -224,7 +222,15 @@ Resources:
 
 
           echo "## TODO Singularity installed. Now running test script."
+
           # Singularity init, run daemon, prep etc. Run a test script TODO
+          cd $HOME
+          git clone https://github.com/frank-ang/ipfs-learning.git
+          cd ipfs-learning
+          git fetch
+          git switch test
+          cd ./singularity
+          nohup ./singularity-init-daemon.sh > singularity-init-daemon.out 2>&1 &
 
           # All done, signal success.
           echo "## Signaling successful to CloudFormation."

@@ -16,7 +16,7 @@ cp ./deal-prep-only.toml $HOME/.singularity/default.toml
 
 # Run as daemon.
 echo "Starting singularity daemon..."
-nohup singularity daemon >> singularity-daemon.log 1>&2
+nohup singularity daemon 2>&1 &
 echo "Started singularity daemon."
 
 # Generate test data

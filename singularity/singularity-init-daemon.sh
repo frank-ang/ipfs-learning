@@ -5,7 +5,6 @@ if [[ -z "$HOME" ]]; then
     exit 1
 fi
 
-cd $HOME
 # Initialize.
 singularity init
 ls $HOME/.singularity

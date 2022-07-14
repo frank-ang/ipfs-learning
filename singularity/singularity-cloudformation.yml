@@ -230,7 +230,7 @@ Resources:
           git fetch
           git switch test
           cd ./singularity
-          nohup ./singularity-init-daemon.sh > singularity-init-daemon.out 2>&1 &
+          nohup ./singularity-tests.sh >> singularity-tests.log 2>&1 &
 
           # All done, signal success.
           echo "## Signaling successful to CloudFormation."

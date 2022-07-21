@@ -9,12 +9,10 @@ fi
 echo "Initializing Singularity..."
 singularity init
 ls $HOME/.singularity
-
 echo "Setting up config for deal prep only."
 cp $HOME/.singularity/default.toml $HOME/.singularity/default.toml.orig
 cp ./deal-prep-only.toml $HOME/.singularity/default.toml
-
-# Run as daemon.
+# Start daemon.
 echo "Starting singularity daemon..."
 nohup singularity daemon 2>&1 &
 echo "Started singularity daemon."
@@ -36,8 +34,14 @@ time $SINGULARITY_CMD
 
 # Verify test result
 echo "Verifying test output..."
-ls $OUT_DIR
-# TODO additional test verification. 
+echo "listing of $OUT_DIR: "`ls -lh $OUT_DIR`
+echo "size of $OUT_DIR: "`du -sh $OUT_DIR`
+echo "count of regular files in $OUT_DIR: "`find -type f $OUT_DIR | wc -l`
+
+# TODO additional test verification.
+# TODO verify database query
+# TODO verify CAR structure.
+# TODO un-CAR and diff.
 
 # TODO additional tests.
 

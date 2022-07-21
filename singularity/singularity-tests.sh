@@ -21,8 +21,7 @@ nohup singularity daemon 2>&1 &
 echo "Started singularity daemon."
 
 # Wait for singularity daemon startup.
-sleep 8
-nc -vz localhost 7001
+sleep 10 && nc -vz localhost 7001
 singularity prep list
 
 # Generate test data
@@ -44,7 +43,7 @@ time $SINGULARITY_CMD
 echo "Verifying test output..."
 echo "listing of $OUT_DIR: "`ls -lh $OUT_DIR`
 echo "size of $OUT_DIR: "`du -sh $OUT_DIR`
-echo "count of regular files in $OUT_DIR: "`find -type f $OUT_DIR | wc -l`
+echo "count of regular files in $OUT_DIR: "`find $OUT_DIR -type f | wc -l`
 
 # TODO additional test verification.
 # TODO verify database query

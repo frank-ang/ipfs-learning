@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [[ -z "$HOME" ]]; then
     echo "HOME undefined." 1>&2
@@ -13,9 +14,12 @@ function _error() {
     exit 1
 }
 
+# Nuke pre-existing config and any crumbs
+pkill -f 'node .*singularity daemon' || true
+rm -rf $HOME/.singularity
+
 # Initialize.
 echo "Initializing Singularity..."
-rm -rf $HOME/.singularity # nuke any pre-existing config.
 singularity init
 ls $HOME/.singularity
 echo "Setting up config for deal prep only."
@@ -27,16 +31,15 @@ nohup singularity daemon 2>&1 &
 echo "Started singularity daemon."
 
 # Wait for singularity daemon startup.
-sleep 10 && nc -vz localhost 7001
-singularity prep list
+sleep 10 && singularity prep list
 
 # Generate test data
 echo "Preparing test data..."
 export DATASET_PATH=/tmp/source
 export OUT_DIR=/tmp/car
 export DATASET_NAME="test0000"
-mkdir -p $DATASET_PATH
-mkdir -p $OUT_DIR
+rm -rf $DATASET_PATH && mkdir -p $DATASET_PATH
+rm -rf $OUT_DIR && mkdir -p $OUT_DIR
 cp -r /root/singularity $DATASET_PATH
 
 # Run test

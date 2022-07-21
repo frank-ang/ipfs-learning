@@ -46,11 +46,11 @@ cp -r /root/singularity $DATASET_PATH
 echo "Running test..."
 export SINGULARITY_CMD="singularity prep create $DATASET_NAME $DATASET_PATH $OUT_DIR"
 echo "executing command: $SINGULARITY_CMD"
-time $SINGULARITY_CMD
+$SINGULARITY_CMD
 
 # Await job completion TODO:
 echo "awaiting prep status completion."
-sleep 2
+sleep 5
 PREP_STATUS="blank"
 MAX_SLEEP_SECS=10
 while [[ "$PREP_STATUS" != "completed" && $MAX_SLEEP_SECS -ge 0 ]]; do

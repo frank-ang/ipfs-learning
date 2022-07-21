@@ -49,14 +49,14 @@ echo "executing command: $SINGULARITY_CMD"
 time $SINGULARITY_CMD
 
 # Await job completion TODO:
-singularity prep status $DATASET_NAME
-echo "sleeping..." && sleep 10
-# TODO loop sleep.
+echo "awaiting prep status completion."
+sleep 2
 PREP_STATUS="blank"
 MAX_SLEEP_SECS=10
-while [ $PREP_STATUS != "completed" && MAX_SLEEP_SECS>0 ]; do
+while [[ "$PREP_STATUS" != "completed" && $MAX_SLEEP_SECS -ge 0 ]]; do
     MAX_SLEEP_SECS=$(( $MAX_SLEEP_SECS - 1 ))
-    if [ MAX_SLEEP_SECS -eq 0 ]; then _error "Timeout waiting for prep success status."; fi
+    if [ $MAX_SLEEP_SECS -eq 0 ]; then _error "Timeout waiting for prep success status."; fi
+    sleep 1
     PREP_STATUS=`singularity prep status --json $DATASET_NAME | jq -r '.generationRequests[].status'`
     echo "PREP_STATUS: $PREP_STATUS"
 done

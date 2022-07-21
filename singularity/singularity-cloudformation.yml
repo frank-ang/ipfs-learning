@@ -59,7 +59,7 @@ Parameters:
     # Hardcoded
 
   InstanceProfile:
-    Description: EC2 Instance Profile ARN (TODO remove hardcoding)
+    Description: EC2 Instance Profile ARN
     Type: String
     Default: mySSMManagedInstance
     # Hardcoded
@@ -72,6 +72,7 @@ Parameters:
   InstanceType:
     Description: EC2 Instance Type
     Type: String
+    # Season to taste
     Default: r5d.large
     AllowedValues:
       - r5d.large
@@ -132,6 +133,7 @@ Resources:
 
           # Cloudformation helper scripts on default python 3.8
           wget --no-verbose -O /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
+          python3 -m easy_install --script-dir /opt/aws/bin /tmp/aws-cfn-bootstrap-py3-latest.tar.gz
 
           # DUMP ENV
           echo "Dumping environment..."
@@ -155,12 +157,8 @@ Resources:
           . "$NVM_DIR/nvm.sh"
           . "$NVM_DIR/bash_completion"
 
-          # TODO check nvm
-          echo "## nvm version: "`nvm version` 
-
+          echo "## nvm version: "`nvm version`
           echo "## Installing Node..." 
-
-          # Install node v16
           nvm install 16
 
           echo "## which node: "`which node`
@@ -214,7 +212,7 @@ Resources:
           cd go-generate-car
           make
 
-          # TODO Then copy the generated binary to override the existing one from the PATH for your node environment, i.e.
+          # Then copy the generated binary to override the existing one from the PATH for your node environment, i.e.
           # singularity installed globally /home/user/.nvm/versions/node/v16.xx.x/lib/node_modules/.bin
           # ls: cannot access '/root/.nvm/versions/node/v16.15.1/lib/node_modules/.bin': No such file or directory
           # mv ./generate-car /root/singularity/node_modules/.bin
@@ -222,9 +220,16 @@ Resources:
           # singularity cloned locally ./node_modules/.bin
           mv ./generate-car /root/singularity/node_modules/.bin
 
+          echo "## Singularity installed. Now running test script."
 
-          echo "## TODO Singularity installed. Now running test script."
-          # Singularity init, run daemon, prep etc. Run a test script TODO
+          # Singularity init, run daemon, prep etc. Run a test script
+          cd $HOME
+          git clone https://github.com/frank-ang/ipfs-learning.git
+          cd ipfs-learning
+          git fetch
+          git switch test
+          cd ./singularity
+          nohup ./singularity-tests.sh >> singularity-tests.log 2>&1 &
 
           # All done, signal success.
           echo "## Signaling successful to CloudFormation."

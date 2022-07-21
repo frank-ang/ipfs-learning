@@ -42,11 +42,24 @@ rm -rf $DATASET_PATH && mkdir -p $DATASET_PATH
 rm -rf $OUT_DIR && mkdir -p $OUT_DIR
 cp -r /root/singularity $DATASET_PATH
 
-# Run test
+# Run data prep test
 echo "Running test..."
 export SINGULARITY_CMD="singularity prep create $DATASET_NAME $DATASET_PATH $OUT_DIR"
 echo "executing command: $SINGULARITY_CMD"
 time $SINGULARITY_CMD
+
+# Await job completion TODO:
+singularity prep status $DATASET_NAME
+echo "sleeping..." && sleep 10
+# TODO loop sleep.
+PREP_STATUS="blank"
+MAX_SLEEP_SECS=10
+while [ $PREP_STATUS != "completed" && MAX_SLEEP_SECS>0 ]; do
+    MAX_SLEEP_SECS=$(( $MAX_SLEEP_SECS - 1 ))
+    if [ MAX_SLEEP_SECS -eq 0 ]; then _error "Timeout waiting for prep success status."; fi
+    PREP_STATUS=`singularity prep status --json $DATASET_NAME | jq -r '.generationRequests[].status'`
+    echo "PREP_STATUS: $PREP_STATUS"
+done
 
 # Verify test result
 export EXPECTED_CAR_COUNT=1
@@ -57,7 +70,12 @@ export ACTUAL_CAR_COUNT=`find $OUT_DIR -type f | wc -l`
 echo "count of regular files in $OUT_DIR: $ACTUAL_CAR_COUNT"
 if [ $ACTUAL_CAR_COUNT -ne $EXPECTED_CAR_COUNT ]; then _error "unexpected count of files: $ACTUAL_CAR_COUNT -ne $EXPECTED_CAR_COUNT"; fi
 
+# TODO need to dive into the following command: 
+#   ```singularity prep  generation-status $GENERATION_ID_TODO.``` 
+# which returns CIDs and file index. 
+
 # TODO additional test verification.
+
 # TODO verify database query
 # TODO verify CAR structure.
 # TODO un-CAR and diff.

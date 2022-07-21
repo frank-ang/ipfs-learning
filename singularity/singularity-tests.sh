@@ -8,6 +8,11 @@ fi
 # increase limits
 ulimit -n 100000
 
+function _error() {
+    echo $1
+    exit 1
+}
+
 # Initialize.
 echo "Initializing Singularity..."
 rm -rf $HOME/.singularity # nuke any pre-existing config.
@@ -41,10 +46,13 @@ echo "executing command: $SINGULARITY_CMD"
 time $SINGULARITY_CMD
 
 # Verify test result
+export EXPECTED_CAR_COUNT=1
 echo "Verifying test output..."
 echo "listing of $OUT_DIR: "`ls -lh $OUT_DIR`
 echo "size of $OUT_DIR: "`du -sh $OUT_DIR`
-echo "count of regular files in $OUT_DIR: "`find $OUT_DIR -type f | wc -l`
+export ACTUAL_CAR_COUNT=`find $OUT_DIR -type f | wc -l`
+echo "count of regular files in $OUT_DIR: $ACTUAL_CAR_COUNT"
+if [ $ACTUAL_CAR_COUNT -ne $EXPECTED_CAR_COUNT ]; then _error "unexpected count of files: $ACTUAL_CAR_COUNT -ne $EXPECTED_CAR_COUNT"; fi
 
 # TODO additional test verification.
 # TODO verify database query

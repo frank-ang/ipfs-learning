@@ -5,6 +5,9 @@ if [[ -z "$HOME" ]]; then
     exit 1
 fi
 
+# increase limits
+ulimit -n 100000
+
 # Initialize.
 echo "Initializing Singularity..."
 singularity init
@@ -16,6 +19,11 @@ cp ./deal-prep-only.toml $HOME/.singularity/default.toml
 echo "Starting singularity daemon..."
 nohup singularity daemon 2>&1 &
 echo "Started singularity daemon."
+
+# Wait for singularity daemon startup.
+sleep 8
+nc -vz localhost 7001
+singularity prep list
 
 # Generate test data
 echo "Preparing test data..."

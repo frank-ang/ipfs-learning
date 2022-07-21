@@ -10,6 +10,7 @@ ulimit -n 100000
 
 # Initialize.
 echo "Initializing Singularity..."
+rm -rf $HOME/.singularity # nuke any pre-existing config.
 singularity init
 ls $HOME/.singularity
 echo "Setting up config for deal prep only."

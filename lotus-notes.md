@@ -214,3 +214,29 @@ Response
 ```
 {"jsonrpc":"2.0","result":{"Version":"1.15.0+2k+git.0ac1bbc7a","APIVersion":66816,"BlockDelay":4},"id":1}
 ```
+
+# Lotus API calls
+## Filecoin.StateMinerPower
+
+~$ printf '{ "jsonrpc": "2.0", "id":1, "method": "Filecoin.StateMinerPower", "params": [ null, null ] }' | curl https://api.chain.love/rpc/v0 -s -XPOST -H 'Content-Type: application/json' -d@/dev/stdin  | jq '.result.TotalPower | map(.|tonumber/1152921504606846976 )'
+[
+  14.448306411504745,
+  18.814851257162104
+]
+
+## Filecoin.ChainHead ?
+ChainHead
+Get current chain height
+
+```
+printf '{ "jsonrpc": "2.0", "id":1, "method": "Filecoin.ChainHead" }' | curl https://api.chain.love/rpc/v0 -s -XPOST -H 'Content-Type: application/json' -d@/dev/stdin  | jq -r '.result.Height'
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32602,
+    "message": "wrong param count (method 'Filecoin.ChainHead'): 2 != 0"
+  }
+}
+```
